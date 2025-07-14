@@ -18,13 +18,18 @@
       padding: 6px;
       margin: 10px;
     }
-    canvas {
-      background-color: white;
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 30px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
+ canvas {
+  max-width: 90%;
+  width: 600px;
+  height: 350px;
+  display: block;
+  margin: 30px auto;
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
   </style>
 </head>
 <body>
@@ -47,8 +52,9 @@
     </label>
   </form>
 
-  <canvas id="barChart" width="600" height="400"></canvas>
-  <canvas id="pieChart" width="600" height="400"></canvas>
+ <canvas id="barChart"></canvas>
+<canvas id="pieChart"></canvas>
+
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
@@ -69,7 +75,12 @@ $data = [];
 
 if ($result->num_rows > 0) {
   while($row = $result->fetch_assoc()) {
-    $labels[] = $row['component'];
+   $labels[] = str_replace(
+  'Expenditure before the trip/packages/entrance fees/tickets',
+  'Pre-trip Fees',
+  $row['component']
+);
+    
     $data[] = (float)$row['amount'];
   }
 }
@@ -81,16 +92,30 @@ $conn->close();
   const chartData = <?= json_encode($data); ?>;
 
   const barConfig = {
-    type: 'bar',
-    data: {
-      labels: chartLabels,
-      datasets: [{
-        label: 'Expenditure (RM million)',
-        data: chartData,
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#7C4DFF']
-      }]
+  type: 'bar',
+  data: {
+    labels: chartLabels,
+    datasets: [{
+      label: 'Expenditure (RM million)',
+      data: chartData,
+      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#7C4DFF']
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { display: true }
+    },
+    scales: {
+      x: {
+        ticks: {
+          maxRotation: 25,
+          minRotation: 0
+        }
+      }
     }
-  };
+  }
+};
+
 
   const pieConfig = {
     type: 'pie',
